@@ -2,6 +2,14 @@
 
 package lesson1
 
+import java.io.FileWriter
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.regex.Pattern
+import kotlin.streams.toList
+
+
 /**
  * Сортировка времён
  *
@@ -31,7 +39,18 @@ package lesson1
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    val p = Pattern.compile("^\\d{2}:\\d{2}:\\d{2}\$")
+
+    val array = Files.lines(Paths.get(inputName), StandardCharsets.UTF_8).toList().toTypedArray()
+    array.forEach { if (!p.matcher(it).matches()) throw IllegalArgumentException() }
+    insertionSort(array)
+
+    FileWriter(outputName, false).use { writer ->
+        for (i in array) {
+            writer.write(i + '\n')
+        }
+        writer.flush()
+    }
 }
 
 /**
