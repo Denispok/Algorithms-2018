@@ -162,8 +162,29 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
+
+/* Трудоёмкость алгоритма = O(NlogN)
+ * Ресурсоёмкость алгоритма = О(N)
+ */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    val list = File(inputName).readLines().toMutableList()
+
+    list.sortWith(Comparator { o1, o2 ->
+        if (o1[0] == '-' && o2[0] != '-') return@Comparator -1
+        if (o2[0] == '-' && o1[0] != '-') return@Comparator 1
+        if (o1[0] == '-' && o2[0] == '-') {
+            if (o1.length > o2.length) return@Comparator -1
+            if (o1.length < o2.length) return@Comparator 1
+            return@Comparator -o1.compareTo(o2)
+        }
+        if (o1.length > o2.length) return@Comparator 1
+        if (o1.length < o2.length) return@Comparator -1
+        return@Comparator o1.compareTo(o2)
+    })
+
+    FileWriter(outputName, false).use { writer ->
+        for (i in list) writer.write(i + '\n')
+    }
 }
 
 /**
