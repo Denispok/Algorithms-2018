@@ -2,9 +2,8 @@
 
 package lesson1
 
+import java.io.File
 import java.io.FileWriter
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.regex.Pattern
 
 
@@ -36,18 +35,21 @@ import java.util.regex.Pattern
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
-fun sortTimes(inputName: String, outputName: String) {
-    val p = Pattern.compile("^\\d{2}:\\d{2}:\\d{2}\$")
 
-    val array = Files.readAllLines(Paths.get(inputName)).toTypedArray()
+/* Трудоёмкость алгоритма = O(N^2) так как сортировка вставками имеет сложность O(N^2) + выполняется проверка
+ * на соответсвие паттерну со сложностью О(N) (берется старшая степень)
+ * Ресурсоёмкость алгоритма = О(N) так как мы храним в памяти только массив О(N), вспомогательные переменные для
+ * сортировки О(1) и массив О(1)
+ */
+fun sortTimes(inputName: String, outputName: String) {
+    val array = File(inputName).readLines().toTypedArray()
+
+    val p = Pattern.compile("^\\d{2}:\\d{2}:\\d{2}\$")
     array.forEach { if (!p.matcher(it).matches()) throw IllegalArgumentException() }
     insertionSort(array)
 
     FileWriter(outputName, false).use { writer ->
-        for (i in array) {
-            writer.write(i + '\n')
-        }
-        writer.flush()
+        for (i in array) writer.write(i + '\n')
     }
 }
 
@@ -77,39 +79,32 @@ fun sortTimes(inputName: String, outputName: String) {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+
+/* Трудоёмкость алгоритма = O(NlogN) так как добавление элементов в streets происходить за О(NlogN)
+ * ведь метод put SortedMap работает за О(logN), people.sort() также выполняется за О(NlogN) так как используется
+ * быстрая сортировка (binary sort) => общая сложность O(NlogN)
+ * Ресурсоёмкость алгоритма = О(N) так как в худшем случае хранение данных в SortedMap занимает О(N)
+ */
 class Streets {
-    val streets = sortedMapOf<String, Street>()
+    val streetMap = sortedMapOf<String, Street>()
     fun add(str: String) {
         val list = str.split(" ")
         val person = list[0] + " " + list[1]
         val street = list[3]
         val home = list[4].toInt()
-        if (streets[street] == null) streets.set(street, Street())
-        streets[street]!!.add(person, home)
+        streetMap.getOrPut(street) { Street() }.add(person, home)
     }
 }
 
 class Street {
     val homes = sortedMapOf<Int, Home>()
-
-    fun add(person: String, home: Int) {
-        if (homes[home] == null) homes.set(home, Home())
-        homes[home]!!.add(person)
-    }
+    fun add(person: String, home: Int) = homes.getOrPut(home) { Home() }.add(person)
 }
 
 class Home {
     var people: MutableList<String> = arrayListOf()
-
-    fun add(person: String) {
-        people.add(person)
-    }
-
-    fun sort() {
-        val array = people.toTypedArray()
-        insertionSort(array)
-        people = array.toMutableList()
-    }
+    fun add(person: String) = people.add(person)
+    fun sort() = people.sort()
 }
 
 
@@ -117,15 +112,15 @@ fun sortAddresses(inputName: String, outputName: String) {
     val p = Pattern.compile("^\\S+ \\S+ - \\S+ \\d+\$")
     val streets = Streets()
 
-    Files.readAllLines(Paths.get(inputName)).forEach {
+    File(inputName).readLines().forEach {
         if (!p.matcher(it).matches()) throw IllegalArgumentException()
         streets.add(it)
     }
 
-    streets.streets.forEach { it.value.homes.forEach { it.value.sort() } }
+    streets.streetMap.forEach { it.value.homes.forEach { it.value.sort() } }
 
     FileWriter(outputName, false).use { writer ->
-        for (i in streets.streets) {
+        for (i in streets.streetMap) {
             for (j in i.value.homes) {
                 writer.write(i.key + " " + j.key + " - ")
                 for (k in 0 until j.value.people.size - 1) {
@@ -134,7 +129,6 @@ fun sortAddresses(inputName: String, outputName: String) {
                 writer.write(j.value.people.last() + "\n")
             }
         }
-        writer.flush()
     }
 }
 
