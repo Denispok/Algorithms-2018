@@ -2,6 +2,8 @@
 
 package lesson2
 
+import java.io.File
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -26,8 +28,31 @@ package lesson2
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+
+/*
+ * Трудоемкость алгоритма = O(N)
+ * Ресурсоемкость алгоритма = O(N)
+ */
 fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
-    TODO()
+    val list = ArrayList<Int>()
+    File(inputName).readLines().forEach { list.add(it.toInt()) }
+    var maxMin = 0
+    var maxMax = 0
+    var curMin = 0
+    var curMax = 0
+    for (i in 0 until list.size) {
+        if (list[i] < list[curMin]) {
+            curMin = i
+            curMax = i
+        } else if (list[i] > list[curMax]) {
+            curMax = i
+            if (list[curMax] - list[curMin] > list[maxMax] - list[maxMin]) {
+                maxMin = curMin
+                maxMax = curMax
+            }
+        }
+    }
+    return Pair(maxMin + 1, maxMax + 1)
 }
 
 /**
@@ -91,8 +116,29 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
  */
+
+/*
+ * N - длина первой строки
+ * K - длина второй строки
+ * Трудоемкость алгоритма = O(N * K)
+ * Ресурсоемкость алгоритма = O(N * K)
+ */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    val array = Array(first.length) { Array(second.length) { 0 } }
+    var maxNumber = 0
+    var maxLastIndex = 0
+    for (i in 0 until first.length) {
+        for (j in 0 until second.length) {
+            if (first[i].equals(second[j])) {
+                array[i][j] = if (i == 0 || j == 0) 1 else array[i - 1][j - 1] + 1
+                if (array[i][j] > maxNumber) {
+                    maxNumber = array[i][j]
+                    maxLastIndex = i
+                }
+            }
+        }
+    }
+    return first.substring(maxLastIndex - maxNumber + 1, maxLastIndex + 1)
 }
 
 /**
