@@ -133,7 +133,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             }
         }
         testGeneratedTemperatures(10)
-        testGeneratedTemperatures(5000)
+        testGeneratedTemperatures(500)
     }
 
     protected fun sortSequence(sortSequence: (String, String) -> Unit) {

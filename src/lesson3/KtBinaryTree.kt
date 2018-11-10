@@ -54,8 +54,61 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Удаление элемента в дереве
      * Средняя
      */
+    /*
+    * Трудоемкость алгоритма = O(logN)
+    * Ресурсоемкость алгоритма = O(1)
+    */
     override fun remove(element: T): Boolean {
-        TODO()
+        val pair = findWithParent(element) ?: return false
+        val node = pair.first
+        val nodeParent = pair.second
+
+        fun replaceNodeBy(newNode: Node<T>?): Boolean {
+            when {
+                nodeParent == null -> root = newNode
+                nodeParent.right == node -> nodeParent.right = newNode
+                nodeParent.left == node -> nodeParent.left = newNode
+            }
+            size--
+            return true
+        }
+
+        when {
+            node.right == null && node.left == null -> return replaceNodeBy(null)
+            node.right == null -> return replaceNodeBy(node.left)
+            node.left == null -> return replaceNodeBy(node.right)
+        }
+
+        if (node.right != null) {
+            if (node.right!!.left == null) {
+                node.right!!.left = node.left
+                replaceNodeBy(node.right)
+            } else {
+                var removingNodeValue = node.right!!.left!!
+                while (removingNodeValue.left != null) removingNodeValue = removingNodeValue.left!!
+                remove(removingNodeValue.value)
+                size++
+                replaceNodeBy(Node(removingNodeValue.value).apply {
+                    left = node.left
+                    right = node.right
+                })
+            }
+        } else if (node.left != null) {
+            if (node.left!!.right == null) {
+                node.left!!.right = node.right
+                replaceNodeBy(node.left)
+            } else {
+                var removingNodeValue = node.left!!.right!!
+                while (removingNodeValue.right != null) removingNodeValue = removingNodeValue.right!!
+                remove(removingNodeValue.value)
+                size++
+                replaceNodeBy(Node(removingNodeValue.value).apply {
+                    left = node.left
+                    right = node.right
+                })
+            }
+        }
+        return true
     }
 
     override operator fun contains(element: T): Boolean {
@@ -75,6 +128,19 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         }
     }
 
+    private fun findWithParent(value: T): Pair<Node<T>, Node<T>?>? =
+            root?.let { findWithParent(it, value) }
+
+    // if no such element return null, if element == root return Pair(root, null)
+    private fun findWithParent(start: Node<T>, value: T): Pair<Node<T>, Node<T>?>? {
+        val comparison = value.compareTo(start.value)
+        return when {
+            comparison < 0 -> start.left?.let { if (it.value.equals(value)) Pair(it, start) else findWithParent(it, value) }
+            comparison > 0 -> start.right?.let { if (it.value.equals(value)) Pair(it, start) else findWithParent(it, value) }
+            else -> Pair(start, null)
+        }
+    }
+
     inner class BinaryTreeIterator : MutableIterator<T> {
 
         private var current: Node<T>? = null
@@ -84,7 +150,29 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Средняя
          */
         private fun findNext(): Node<T>? {
-            TODO()
+            var newCurrent: Node<T>? = current
+            if (current == null) newCurrent = root
+            else if (current!!.left != null) newCurrent = current!!.left
+            else if (current!!.right != null) newCurrent = current!!.right
+            else {
+                var parent: Node<T>?
+                while (true) {
+                    parent = findWithParent(newCurrent!!.value)!!.second ?: return null
+                    if (parent.right == newCurrent) {
+                        newCurrent = parent
+                        continue
+                    }
+                    if (parent.right != null) {
+                        newCurrent = parent.right
+                        break
+                    }
+                    if (parent.left == newCurrent) {
+                        newCurrent = parent
+                        continue
+                    }
+                }
+            }
+            return newCurrent
         }
 
         override fun hasNext(): Boolean = findNext() != null
