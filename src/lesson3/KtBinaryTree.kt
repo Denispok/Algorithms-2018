@@ -59,9 +59,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
     * Ресурсоемкость алгоритма = O(1)
     */
     override fun remove(element: T): Boolean {
-        val pair = findWithParent(element) ?: return false
-        val node = pair.first
-        val nodeParent = pair.second
+        val (node, nodeParent) = findWithParent(element) ?: return false
 
         fun replaceNodeBy(newNode: Node<T>?): Boolean {
             when {
@@ -79,34 +77,18 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
             node.left == null -> return replaceNodeBy(node.right)
         }
 
-        if (node.right != null) {
-            if (node.right!!.left == null) {
-                node.right!!.left = node.left
-                replaceNodeBy(node.right)
-            } else {
-                var removingNodeValue = node.right!!.left!!
-                while (removingNodeValue.left != null) removingNodeValue = removingNodeValue.left!!
-                remove(removingNodeValue.value)
-                size++
-                replaceNodeBy(Node(removingNodeValue.value).apply {
-                    left = node.left
-                    right = node.right
-                })
-            }
-        } else if (node.left != null) {
-            if (node.left!!.right == null) {
-                node.left!!.right = node.right
-                replaceNodeBy(node.left)
-            } else {
-                var removingNodeValue = node.left!!.right!!
-                while (removingNodeValue.right != null) removingNodeValue = removingNodeValue.right!!
-                remove(removingNodeValue.value)
-                size++
-                replaceNodeBy(Node(removingNodeValue.value).apply {
-                    left = node.left
-                    right = node.right
-                })
-            }
+        if (node.right!!.left == null) {
+            node.right!!.left = node.left
+            replaceNodeBy(node.right)
+        } else {
+            var removingNodeValue = node.right!!.left!!
+            while (removingNodeValue.left != null) removingNodeValue = removingNodeValue.left!!
+            remove(removingNodeValue.value)
+            size++
+            replaceNodeBy(Node(removingNodeValue.value).apply {
+                left = node.left
+                right = node.right
+            })
         }
         return true
     }
@@ -150,20 +132,19 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Средняя
          */
         private fun findNext(): Node<T>? {
-            var newCurrent: Node<T>? = current
-            if (current == null) newCurrent = root
-            else if (current!!.left != null) newCurrent = current!!.left
-            else if (current!!.right != null) newCurrent = current!!.right
+            var newCurrent: Node<T> = current ?: return root
+            if (newCurrent.left != null) newCurrent = newCurrent.left!!
+            else if (newCurrent.right != null) newCurrent = newCurrent.right!!
             else {
-                var parent: Node<T>?
+                var parent: Node<T>
                 while (true) {
-                    parent = findWithParent(newCurrent!!.value)!!.second ?: return null
+                    parent = findWithParent(newCurrent.value)?.second ?: return null
                     if (parent.right == newCurrent) {
                         newCurrent = parent
                         continue
                     }
                     if (parent.right != null) {
-                        newCurrent = parent.right
+                        newCurrent = parent.right!!
                         break
                     }
                     if (parent.left == newCurrent) {
