@@ -123,30 +123,6 @@ class BinaryTreeTest {
         testIterator { createJavaTree() }
     }
 
-    @Test
-    fun testPreOrderIterator() {
-        val random = Random()
-        for (iteration in 1..100) {
-            val set = mutableSetOf<Int>()
-            for (i in 1..20) {
-                set.add(random.nextInt(100))
-            }
-            val binaryTree = createKotlinTree<Int>()
-            for (element in set) {
-                binaryTree += element
-            }
-            val binaryIt = binaryTree.iterator()
-            val binarySet = mutableSetOf<Int>()
-            while (binaryIt.hasNext()) {
-                binarySet.add(binaryIt.next())
-            }
-            assertEquals(set.size, binarySet.size)
-            for (i in set) {
-                assertTrue(binarySet.contains(i))
-            }
-        }
-    }
-
     private fun testIteratorRemove(create: () -> CheckableSortedSet<Int>) {
         val random = Random()
         for (iteration in 1..100) {

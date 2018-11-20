@@ -1,6 +1,6 @@
 package lesson3
 
-import java.util.SortedSet
+import java.util.*
 import kotlin.NoSuchElementException
 
 // Attention: comparable supported but comparator is not
@@ -132,28 +132,28 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Средняя
          */
         private fun findNext(): Node<T>? {
-            var newCurrent: Node<T> = current ?: return root
-            if (newCurrent.left != null) newCurrent = newCurrent.left!!
-            else if (newCurrent.right != null) newCurrent = newCurrent.right!!
-            else {
-                var parent: Node<T>
-                while (true) {
-                    parent = findWithParent(newCurrent.value)?.second ?: return null
-                    if (parent.right == newCurrent) {
-                        newCurrent = parent
-                        continue
-                    }
-                    if (parent.right != null) {
-                        newCurrent = parent.right!!
-                        break
-                    }
-                    if (parent.left == newCurrent) {
-                        newCurrent = parent
-                        continue
-                    }
-                }
+            if (current == null) {
+                var next = root ?: return null
+                while (next.left != null)
+                    next = next.left!!
+                return next
             }
-            return newCurrent
+
+            var next = current
+
+            if (next!!.right != null) {
+                next = next.right
+                while (next!!.left != null)
+                    next = next.left
+                return next
+            }
+
+            while (true) {
+                val parent = findWithParent(next!!.value)!!.second ?: return null
+                if (parent.left == next)
+                    return parent
+                next = parent
+            }
         }
 
         override fun hasNext(): Boolean = findNext() != null
