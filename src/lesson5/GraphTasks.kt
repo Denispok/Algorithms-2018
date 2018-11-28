@@ -127,5 +127,22 @@ fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
  */
 fun Graph.longestSimplePath(): Path {
-    TODO()
+    val list = mutableListOf<Graph.Vertex>()
+    var bestList = listOf<Graph.Vertex>()
+
+    fun search(vertex: Graph.Vertex): Boolean {
+        if (list.size > bestList.size) bestList = list
+        if (list.size == this.vertices.size) return true
+        val neighbors = this.getNeighbors(vertex)
+        for (neighbor in neighbors) {
+            if (list.contains(neighbor)) continue
+            list.add(neighbor)
+            if (search(neighbor)) return true
+        }
+        if (!list.isEmpty()) list.removeAt(list.size - 1)
+        return false
+    }
+
+    for (i in this.vertices) if (search(i)) break
+    return Path(bestList)
 }
