@@ -23,7 +23,7 @@ abstract class AbstractGraphTests {
         for (i in 0 until size - 1) {
             assertTrue(this[i].isNeighbour(this[i + 1]), "Edges ${this[i]} & ${this[i + 1]} are not incident")
         }
-        assertTrue(this[0].isNeighbour(this[size - 1]), "Edges ${this[0]} & ${this[size - 1]} are not incident")
+        if (!this.isEmpty()) assertTrue(this[0].isNeighbour(this[size - 1]), "Edges ${this[0]} & ${this[size - 1]} are not incident")
     }
 
     fun findEulerLoop(findEulerLoop: Graph.() -> List<Graph.Edge>) {
@@ -65,6 +65,17 @@ abstract class AbstractGraphTests {
         }.build()
         val loop2 = graph2.findEulerLoop()
         loop2.assert(true, graph2)
+        val graph3 = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            addConnection(c, a)
+            addConnection(c, b)
+            addConnection(c, d)
+        }.build()
+        val loop3 = graph3.findEulerLoop()
+        loop3.assert(false, graph3)
     }
 
     fun minimumSpanningTree(minimumSpanningTree: Graph.() -> Graph) {

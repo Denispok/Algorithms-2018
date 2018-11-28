@@ -29,7 +29,21 @@ package lesson5
  * связного графа ровно по одному разу
  */
 fun Graph.findEulerLoop(): List<Graph.Edge> {
-    TODO()
+    val list = arrayListOf<Graph.Edge>()
+    fun search(vertex: Graph.Vertex): Boolean {
+        if (list.size == this.edges.size) return true
+        val neighbors = this.getNeighbors(vertex)
+        for (neighbor in neighbors) {
+            val connection = getConnection(vertex, neighbor)!!
+            if (list.contains(connection)) continue
+            list.add(connection)
+            if (search(neighbor)) return true
+        }
+        if (!list.isEmpty()) list.removeAt(list.size - 1)
+        return false
+    }
+    search(this.vertices.first())
+    return list
 }
 
 /**
