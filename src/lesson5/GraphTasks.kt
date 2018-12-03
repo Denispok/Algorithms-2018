@@ -28,6 +28,10 @@ package lesson5
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
  */
+ /*
+ * Трудоемкость алгоритма = O(E)
+ * Ресурсоемкость алгоритма = O(E)
+ */
 fun Graph.findEulerLoop(): List<Graph.Edge> {
     val list = arrayListOf<Graph.Edge>()
     fun search(vertex: Graph.Vertex): Boolean {
@@ -125,6 +129,10 @@ fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
  * J ------------ K
  *
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
+ */
+ /*
+ * Трудоемкость алгоритма = O(V)
+ * Ресурсоемкость алгоритма = O(V)
  */
 fun Graph.longestSimplePath(): Path {
     val list = mutableListOf<Graph.Vertex>()
