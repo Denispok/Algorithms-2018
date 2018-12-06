@@ -29,7 +29,7 @@ package lesson5
  * связного графа ровно по одному разу
  */
  /*
- * Трудоемкость алгоритма = O(E)
+ * Трудоемкость алгоритма = O(E+V)
  * Ресурсоемкость алгоритма = O(E)
  */
 fun Graph.findEulerLoop(): List<Graph.Edge> {
@@ -131,7 +131,7 @@ fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
  */
  /*
- * Трудоемкость алгоритма = O(V)
+ * Трудоемкость алгоритма = O(V*(V+E))
  * Ресурсоемкость алгоритма = O(V)
  */
 fun Graph.longestSimplePath(): Path {
